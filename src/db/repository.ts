@@ -3,12 +3,13 @@ import { Account, Category, FinanceSnapshot, FixedBudget, FlexibleBudget, Transa
 
 const asBool = (value: number) => value === 1;
 export async function loadSnapshot(db: SQLite.SQLiteDatabase): Promise<FinanceSnapshot> {
-  const [accounts, transactions, categories, fixedBudgets, flexibleBudgets] = await Promise.all([
+  const [accounts, transactions, categories, fixedBudgets, flexibleBudgets, settings] = await Promise.all([
     db.getAllAsync<any>('SELECT id, name, type, institution, opening_balance as openingBalance, is_archived as archived, sort_order as sortOrder FROM accounts ORDER BY sort_order, name'),
     db.getAllAsync<any>('SELECT id, type, amount, account_id as accountId, destination_account_id as destinationAccountId, category_id as categoryId, transaction_date as date, transaction_time as time, description, notes FROM transactions ORDER BY transaction_date DESC, transaction_time DESC'),
     db.getAllAsync<Category>('SELECT id, name, icon, type FROM categories WHERE is_active = 1 ORDER BY name'),
     db.getAllAsync<any>('SELECT id, name, amount, due_day as dueDay, recurrence, is_active as active FROM fixed_budgets ORDER BY due_day, name'),
     db.getAllAsync<any>('SELECT id, percentage, is_active as active FROM flexible_budgets ORDER BY rowid'),
+    db.getFirstAsync<{ value: string }>('SELECT value FROM settings WHERE key = ?', 'user_name'),
   ]);
   return {
     accounts: accounts.map((item) => ({ ...item, archived: asBool(item.archived), openingBalance: Number(item.openingBalance), sortOrder: Number(item.sortOrder) })) as Account[],
@@ -16,6 +17,7 @@ export async function loadSnapshot(db: SQLite.SQLiteDatabase): Promise<FinanceSn
     categories,
     fixedBudgets: fixedBudgets.map((item) => ({ ...item, amount: Number(item.amount), dueDay: item.dueDay == null ? undefined : Number(item.dueDay), active: asBool(item.active) })) as FixedBudget[],
     flexibleBudgets: flexibleBudgets.map((item) => ({ ...item, percentage: Number(item.percentage), active: asBool(item.active) })) as FlexibleBudget[],
+    userName: settings?.value ?? 'Ardi Rahman',
   };
 }
 
@@ -34,3 +36,4 @@ export async function updateFixedBudget(db: SQLite.SQLiteDatabase, item: FixedBu
 export async function updateFlexibleBudgets(db: SQLite.SQLiteDatabase, items: FlexibleBudget[]) { for (const item of items) await db.runAsync('UPDATE flexible_budgets SET percentage = ?, is_active = ? WHERE id = ?', item.percentage, item.active ? 1 : 0, item.id); }
 export async function replaceTransaction(db: SQLite.SQLiteDatabase, transaction: Transaction) { await db.runAsync('DELETE FROM transactions WHERE id = ?', transaction.id); await insertTransaction(db, transaction); }
 export async function deleteTransaction(db: SQLite.SQLiteDatabase, id: string) { await db.runAsync('DELETE FROM transactions WHERE id = ?', id); }
+export async function saveSetting(db: SQLite.SQLiteDatabase, key: string, value: string) { await db.runAsync('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value', key, value); }

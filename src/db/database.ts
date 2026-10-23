@@ -27,7 +27,7 @@ export const SEED_TRANSACTIONS = [
 export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
   await db.execAsync(`PRAGMA journal_mode = WAL;
     CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS accounts (id TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL, type TEXT NOT NULL, institution TEXT, opening_balance INTEGER NOT NULL DEFAULT 0, is_archived INTEGER NOT NULL DEFAULT 0, sort_order INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+    CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS categories (id TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL, icon TEXT NOT NULL, type TEXT NOT NULL, is_active INTEGER NOT NULL DEFAULT 1);
     CREATE TABLE IF NOT EXISTS transactions (id TEXT PRIMARY KEY NOT NULL, type TEXT NOT NULL CHECK(type IN ('income','expense','transfer')), amount INTEGER NOT NULL CHECK(amount > 0), account_id TEXT NOT NULL REFERENCES accounts(id), destination_account_id TEXT REFERENCES accounts(id), category_id TEXT REFERENCES categories(id), transaction_date TEXT NOT NULL, transaction_time TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', notes TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
     CREATE TABLE IF NOT EXISTS fixed_budgets (id TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL, amount INTEGER NOT NULL CHECK(amount >= 0), due_day INTEGER, recurrence TEXT NOT NULL DEFAULT 'monthly', is_active INTEGER NOT NULL DEFAULT 1);
@@ -35,6 +35,7 @@ export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
     CREATE INDEX IF NOT EXISTS transactions_date_idx ON transactions(transaction_date);
     CREATE INDEX IF NOT EXISTS transactions_account_idx ON transactions(account_id);
   `);
+  await db.runAsync('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)', 'user_name', 'Ardi Rahman');
   const seeded = await db.getFirstAsync<{ value: string }>('SELECT value FROM schema_meta WHERE key = ?', 'seeded');
   if (seeded?.value === '1') return;
   await db.withTransactionAsync(async () => {

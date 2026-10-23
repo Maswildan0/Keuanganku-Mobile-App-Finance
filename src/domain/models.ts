@@ -28,4 +28,4 @@ export type FixedBudget = { id: string; name: string; amount: number; dueDay?: n
 export type FlexibleBudget = { id: string; percentage: number; active: boolean };
 export type FlexibleAllocation = FlexibleBudget & { amount: number };
 export type Cashflow = { income: number; expense: number; net_cashflow: number };
-export type FinanceSnapshot = { accounts: Account[]; transactions: Transaction[]; categories: Category[]; fixedBudgets: FixedBudget[]; flexibleBudgets: FlexibleBudget[] };
+export type FinanceSnapshot = { accounts: Account[]; transactions: Transaction[]; categories: Category[]; fixedBudgets: FixedBudget[]; flexibleBudgets: FlexibleBudget[]; userName: string };
