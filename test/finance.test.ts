@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { getAccountBalances, getCategorySpend, getDailyCashflow, getFixedTotal, getFlexibleAllocations, getFlexiblePool, getMonthlyCashflow, getTotalBalance, getYearlyCashflow } from '../src/domain/finance';
+import { Account, Transaction } from '../src/domain/models';
+
+const accounts: Account[] = [{ id: 'a', name: 'Cash', type: 'Cash', openingBalance: 1000, archived: false, sortOrder: 0 }, { id: 'b', name: 'BCA', type: 'Bank Account', openingBalance: 500, archived: false, sortOrder: 1 }];
+const transactions: Transaction[] = [{ id: 'income', type: 'income', amount: 300, accountId: 'a', date: '2026-10-19', time: '09:00', description: 'Gaji' }, { id: 'expense', type: 'expense', amount: 100, accountId: 'a', categoryId: 'food', date: '2026-10-19', time: '12:00', description: 'Makan' }, { id: 'transfer', type: 'transfer', amount: 200, accountId: 'a', destinationAccountId: 'b', date: '2026-10-20', time: '13:00', description: 'Pindah' }];
+
+test('derives balances and preserves total through transfers', () => { assert.deepEqual(getAccountBalances(accounts, transactions), { a: 1000, b: 700 }); assert.equal(getTotalBalance(accounts, transactions), 1700); });
+test('fixed and flexible pools', () => { assert.equal(getFixedTotal([{ amount: 900, active: true }, { amount: 100, active: false }]), 900); assert.equal(getFlexiblePool(800, 900), 0); assert.equal(getFlexiblePool(1200, 900), 300); assert.deepEqual(getFlexibleAllocations([{ id: 'food', percentage: 35, active: true }, { id: 'saving', percentage: 65, active: true }], 1000).map((item) => item.amount), [350, 650]); });
+test('category spending and edited data remain derived', () => { assert.deepEqual(getCategorySpend(transactions, '2026-10-01', '2026-10-31'), { food: 100 }); const edited = transactions.map((item) => item.id === 'expense' ? { ...item, amount: 250 } : item); assert.equal(getCategorySpend(edited, '2026-10-01', '2026-10-31').food, 250); assert.equal(getCategorySpend(transactions.filter((item) => item.type !== 'expense'), '2026-10-01', '2026-10-31').food ?? 0, 0); });
+test('weekly monthly yearly cashflow excludes transfers', () => { const daily = getDailyCashflow(transactions, '2026-10-19', '2026-10-25'); assert.equal(daily[0].income, 300); assert.equal(daily[0].expense, 100); assert.equal(daily[1].income, 0); assert.equal(daily[1].expense, 0); assert.equal(getMonthlyCashflow(transactions, 2026)[9].income, 300); assert.equal(getYearlyCashflow(transactions, 2026, 2026)[0].expense, 100); });

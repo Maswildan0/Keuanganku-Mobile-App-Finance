@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Arus",
+    "slug": "arus-finance",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "arus",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.arus.finance",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Arus menggunakan Face ID untuk melindungi data keuanganmu."
+      }
+    },
+    "android": {
+      "package": "com.arus.finance",
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F8F6"
+      },
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-secure-store",
+      "expo-local-authentication"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1e7e4f41-b425-4f58-b039-559639af61c2"
+      }
+    },
+    "owner": "lxthyst"
+  }
+}
