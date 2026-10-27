@@ -1,9 +1,15 @@
 import React from 'react';
 import { Pressable, Text, TextInput, TextInputProps, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, styles } from '../theme/theme';
+import { colors, getTabBarHeight, getTabBarPaddingBottom, styles, TAB_BAR_SPACING } from '../theme/theme';
 
 export function Icon({ name, size = 19, color = colors.ink }: { name: string; size?: number; color?: string }) { const iconName = iconMap[name as keyof typeof iconMap] ?? iconMap.dots; return <Ionicons name={iconName} size={size} color={color} />; }
+export function useTabBarLayout() {
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = getTabBarHeight(insets.bottom);
+  return { insets, tabBarHeight, tabBarPaddingBottom: getTabBarPaddingBottom(insets.bottom), contentBottomPadding: tabBarHeight + TAB_BAR_SPACING, fabBottom: tabBarHeight + TAB_BAR_SPACING };
+}
 const iconMap = { home: 'home-outline', list: 'list-outline', budget: 'bar-chart-outline', user: 'person-outline', plus: 'add', chevron: 'chevron-forward', back: 'chevron-back', close: 'close', edit: 'create-outline', trash: 'trash-outline', transfer: 'swap-horizontal-outline', calendar: 'calendar-outline', food: 'restaurant-outline', route: 'navigate-outline', spark: 'sparkles-outline', safe: 'shield-checkmark-outline', wallet: 'wallet-outline', bolt: 'flash-outline', dots: 'ellipsis-horizontal', arrowDown: 'arrow-down-outline', shield: 'shield-checkmark-outline', lock: 'lock-closed-outline', arrow: 'arrow-forward', check: 'checkmark', up: 'chevron-up', down: 'chevron-down', card: 'card-outline', cash: 'cash-outline', search: 'search-outline' } as const;
 
 export const formatMoney = (value: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.round(value)).replace('Rp', 'Rp');

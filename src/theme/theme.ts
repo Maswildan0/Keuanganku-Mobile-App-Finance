@@ -5,6 +5,10 @@ export const colors = {
 };
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
 export const radius = { sm: 8, md: 11, lg: 16 };
+export const TAB_BAR_BASE_HEIGHT = 64;
+export const TAB_BAR_SPACING = spacing.lg;
+export const getTabBarHeight = (bottomInset: number) => TAB_BAR_BASE_HEIGHT + bottomInset;
+export const getTabBarPaddingBottom = (bottomInset: number) => Math.max(bottomInset, spacing.sm);
 export const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   content: { paddingHorizontal: 20, paddingBottom: 110 },

@@ -1,23 +1,31 @@
 {
   "expo": {
-    "name": "Arus",
+    "name": "Keuanganku",
     "slug": "arus-finance",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "arus",
+    "scheme": "keuanganku",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "icon": "./assets/branding/keuanganku-icon.png",
+    "splash": {
+      "image": "./assets/branding/keuanganku-splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#075B5E"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.arus.finance",
       "infoPlist": {
-        "NSFaceIDUsageDescription": "Arus menggunakan Face ID untuk melindungi data keuanganmu."
+        "NSFaceIDUsageDescription": "Keuanganku menggunakan Face ID untuk melindungi data keuanganmu."
       }
     },
     "android": {
       "package": "com.arus.finance",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
-        "backgroundColor": "#F7F8F6"
+        "foregroundImage": "./assets/branding/keuanganku-foreground.png",
+        "backgroundColor": "#075B5E"
       },
       "permissions": [
         "android.permission.USE_BIOMETRIC",
@@ -26,6 +34,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-dev-client",
       "expo-sqlite",
       "expo-secure-store",
       "expo-local-authentication"

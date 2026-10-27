@@ -1,8 +1,40 @@
 node_modules/
 .expo/
+.expo-shared/
 dist/
+web-build/
+coverage/
+*.tsbuildinfo
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+
+# Runtime data and logs
 *.log
-.env*
+*.db
+*.db-wal
+*.db-shm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating system files
 .DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local IDE settings
+.idea/
+*.iml
+
+# Generated native projects in managed Expo workflow
 android/
 ios/
